@@ -1,19 +1,4 @@
-name: Flutter Build APK
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    # Menambahkan environment variable agar pakai Node terbaru sesuai saran GitHub
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-    steps:
+steps:
       - uses: actions/checkout@v4
 
       - name: Install Java
@@ -21,23 +6,26 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-          cache: 'gradle' # Mempercepat build berikutnya
+          cache: 'gradle'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.2' # Versi yang kamu pakai tadi
+          flutter-version: '3.41.2'
           channel: 'stable'
 
       - name: Get Dependencies
         run: flutter pub get
 
-      # LANGKAH KRUSIAL: Memberi izin eksekusi pada gradlew
+      # INI MANTRA BARUNYA: Memaksa Flutter membuat ulang file Android yang hilang
+      - name: Generate Missing Android Files
+        run: flutter create . --platforms=android
+
+      # Sekarang file gradlew pasti sudah ada, baru kita beri izin
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
 
       - name: Build APK
-        # Menggunakan flag skip agar tidak terhenti masalah versi AGP seperti tadi
         run: flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
 
       - name: Upload APK
