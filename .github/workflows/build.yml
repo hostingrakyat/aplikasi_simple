@@ -1,4 +1,19 @@
-steps:
+name: Flutter Build APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Menambahkan environment variable agar pakai Node terbaru sesuai saran GitHub
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
       - uses: actions/checkout@v4
 
       - name: Install Java
